@@ -278,8 +278,6 @@ public:
 
     virtual void render(MenuComponentRenderer const& renderer) const;
 
-    bool has_focus();
-
 protected:
     virtual bool next(bool loop=false);
     virtual bool prev(bool loop=false);
@@ -294,6 +292,51 @@ protected:
     FormatValueFnPtr _format_value_fn;
 };
 
+enum EDITING_STATE {
+	FOCUSED, SELECTION, EDITING
+};
+
+//! \brief A MenuItem for editing a short text string
+//!
+//! TextEditMenuItem is a menu item for automatically
+//! edit a short text buffer. It's specialised for use
+//! with an rotary encoder. On editing ending the
+//! the user-defined Menu::_select_fn callback is called.
+class TextEditMenuItem: public MenuItem {
+public:
+	//! Constructor
+	//!
+	//! @param name The name of the menu item.
+	//! @param select_fn The function to call when this MenuItem is selected.
+	//! @param value the buffer with the text to edit.
+	//! @param size size of the buffer
+	TextEditMenuItem(const char* name, SelectFnPtr select_fn, char* value, uint8_t size);
+
+	EDITING_STATE _editing_state;
+
+	char* get_value() const;
+	uint8_t get_size() const;
+	uint8_t get_pos() const;
+
+	void set_value(char* value);
+	void set_size(byte size);
+
+	virtual void render(MenuComponentRenderer const& renderer) const;
+
+protected:
+	virtual bool next(bool loop = false);
+	virtual bool prev(bool loop = false);
+
+	virtual Menu* select();
+
+	char getNextValidChar(char value);
+	char getPrevValidChar(char value);
+
+protected:
+	char* _value;
+	uint8_t _size;
+	uint8_t _pos;
+};
 
 //! \brief A MenuComponent that can contain other MenuComponents.
 //!
@@ -386,6 +429,7 @@ public:
     virtual void render_menu_item(MenuItem const& menu_item) const = 0;
     virtual void render_back_menu_item(BackMenuItem const& menu_item) const = 0;
     virtual void render_numeric_menu_item(NumericMenuItem const& menu_item) const = 0;
+    virtual void render_text_edit_menu_item(TextEditMenuItem const& menu_item) const;
     virtual void render_menu(Menu const& menu) const = 0;
 };
 
