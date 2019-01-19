@@ -293,7 +293,7 @@ protected:
 };
 
 enum EDITING_STATE {
-	FOCUSED, SELECTION, EDITING
+	SELECTION, EDITING
 };
 
 //! \brief A MenuItem for editing a short text string
